@@ -508,6 +508,7 @@ void RCSwitch::send(unsigned long code, unsigned int length) {
 			}
     }
     this->transmit(protocol.syncFactor);
+		printf("\n");
   }
 
 #if not defined( RCSwitchDisableReceiving )
