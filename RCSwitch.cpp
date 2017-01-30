@@ -502,9 +502,9 @@ void RCSwitch::send(unsigned long code, unsigned int length) {
       if (code & (1L << i)) {
         this->transmit(protocol.one);
 				printf("1");
-			} else {}
+			} else {
         this->transmit(protocol.zero);
-				printf("1");
+				printf("0");
 			}
     }
     this->transmit(protocol.syncFactor);
