@@ -32,6 +32,7 @@
 */
 
 #include "RCSwitch.h"
+#include <stdio.h>
 
 #ifdef RaspberryPi
     // PROGMEM and _P functions are for AVR based microprocessors,
@@ -500,8 +501,10 @@ void RCSwitch::send(unsigned long code, unsigned int length) {
     for (int i = length-1; i >= 0; i--) {
       if (code & (1L << i))
         this->transmit(protocol.one);
+				printf("1");
       else
         this->transmit(protocol.zero);
+				printf("1");
     }
     this->transmit(protocol.syncFactor);
   }
