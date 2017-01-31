@@ -470,7 +470,7 @@ void RCSwitch::sendTriState(const char* sCodeWord) {
  */
 void RCSwitch::sendNexa(const char* sCodeWord) {
   // turn the tristate code word into the corresponding bit pattern, then send it
-  unsigned long code = 0;
+  unsigned long long code = 0;
   unsigned int length = 0;
   for (const char* p = sCodeWord; *p; p++) {
     code <<= 2L;
@@ -486,7 +486,7 @@ void RCSwitch::sendNexa(const char* sCodeWord) {
     }
     length += 2;
   }
-  this->send(code, length);
+  this->sendlong(code, length);
 }
 
 /**
@@ -513,6 +513,46 @@ void RCSwitch::send(const char* sCodeWord) {
  * then the bit at position length-2, and so on, till finally the bit at position 0.
  */
 void RCSwitch::send(unsigned long code, unsigned int length) {
+  if (this->nTransmitterPin == -1)
+    return;
+
+#if not defined( RCSwitchDisableReceiving )
+  // make sure the receiver is disabled while we transmit
+  int nReceiverInterrupt_backup = nReceiverInterrupt;
+  if (nReceiverInterrupt_backup != -1) {
+    this->disableReceive();
+  }
+#endif
+
+  for (int nRepeat = 0; nRepeat < nRepeatTransmit; nRepeat++) {
+    for (int i = length-1; i >= 0; i--) {
+      if (code & (1L << i)) {
+        this->transmit(protocol.one);
+				printf("1");
+			} else {
+        this->transmit(protocol.zero);
+				printf("0");
+			}
+    }
+    this->transmit(protocol.syncFactor);
+		printf("\n");
+  }
+
+#if not defined( RCSwitchDisableReceiving )
+  // enable receiver again if we just disabled it
+  if (nReceiverInterrupt_backup != -1) {
+    this->enableReceive(nReceiverInterrupt_backup);
+  }
+#endif
+}
+
+
+/**
+ * Transmit the first 'length' bits of the integer 'code'. The
+ * bits are sent from MSB to LSB, i.e., first the bit at position length-1,
+ * then the bit at position length-2, and so on, till finally the bit at position 0.
+ */
+void RCSwitch::sendlong(unsigned long long code, unsigned int length) {
   if (this->nTransmitterPin == -1)
     return;
 
