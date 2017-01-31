@@ -464,6 +464,31 @@ void RCSwitch::sendTriState(const char* sCodeWord) {
   this->send(code, length);
 }
 
+
+/**
+ * @param sCodeWord   a nexa code word consisting of the letter 0, 1
+ */
+void RCSwitch::sendNexa(const char* sCodeWord) {
+  // turn the tristate code word into the corresponding bit pattern, then send it
+  unsigned long code = 0;
+  unsigned int length = 0;
+  for (const char* p = sCodeWord; *p; p++) {
+    code <<= 2L;
+    switch (*p) {
+      case '0':
+        // bit pattern 01
+        code |= 1L;
+        break;
+      case '1':
+        // bit pattern 10
+        code |= 2L;
+        break;
+    }
+    length += 2;
+  }
+  this->send(code, length);
+}
+
 /**
  * @param sCodeWord   a binary code word consisting of the letter 0, 1
  */
@@ -479,6 +504,8 @@ void RCSwitch::send(const char* sCodeWord) {
   }
   this->send(code, length);
 }
+
+
 
 /**
  * Transmit the first 'length' bits of the integer 'code'. The
